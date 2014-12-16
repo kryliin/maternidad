@@ -22,36 +22,64 @@ class PagoFactura {
 
     static constraints = {
         retencion(nullable: true)
+        //retencion(nullable: true, validator: validadorRetencion)
+        monto(nullable: false)//, validator: validadorMonto)
+        factura(nullable: false)
+        numeroComprobante(nullable: false)
+        tipoPago(nullable: false)
+
     }
 
-    String toString() { "${fecha?.format('dd/MM/yyyy')} - ${monto}" }
+    def beforeInsert = {
+    }
 
-//    static pagosFacturaOrdenar(Factura factura) {
-    //       def pagos = []
-    //       if (factura) {
-//            pagos = PagoFactura.findAllByFactura(factura)
-//            pagos.sort {it.nrofactura }
-    //      }
-    //       pagos
-    //   }
+    def beforeUpdate = {
+    }
 
-//    def beforeInsert = {
-    //      pagosFacturaOrdenar(factura)
-//        actualizarRetencion()
-    // }
-//
-    //  def beforeUpdate = {
-    //     pagosFacturaOrdenar(factura)
-//        actualizarRetencion()
-    // }
-//
-//    private void actualizarRetencion () {
+//    private void actualizarRetencion() {
 //        Double total = 0
 //        retencionPagos?.each {
-//            total+= it?.monto
+//            total += it?.monto
 //        }
 //        retencion = total
 //    }
 
+    static def validadorRetencion = {
+        val, Factura obj ->
+            def resp = true
+            if (retencion > obj?.totalFacturado) {
+                resp = "pagoFactura.monto.invalido"
+            }
+            resp
+    }
 
+
+    static def validadorMonto = {
+        val, Factura obj ->
+
+            println 'val'
+            println val
+
+
+            def resp = true
+            def totalPagos = obj?.getTotalPagos() - obj?.getTotalRetencion()
+            if (val > totalPagos) {
+                resp = "pagoFactura.pago.mayor.a.monto"
+            } else {
+            obj?.totalPagado = obj?.totalPagado +  val
+            }
+            resp
+    }
+
+//    static pagosFacturaOrdenar(Factura factura) {
+//        def pagos = []
+//        if (factura) {
+//            pagos = PagoFactura.findAllByFactura(factura)
+//            pagos.sort { it.nrofactura }
+//        }
+//        pagos
+//    }
+
+
+    String toString() { "${fecha?.format('dd/MM/yyyy')} ++ ${monto}" }
 }

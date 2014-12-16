@@ -18,7 +18,7 @@ class MovimientoProfesional {
         credito(nullable: false,blank:false)
         monto(nullable: false,blank:false, scale: 2, matches: "[0-9]")
         observacion(size:0..5000, nullable:true, blank:true, widget:"textarea")
-        usuario(nullable: false,blank:false)
+        usuario(nullable: true,blank:true)
     }
 
     String toString() { "Nº ${id}" }

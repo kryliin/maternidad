@@ -17,8 +17,8 @@ class Profesional {
     ]
 
     static hasMany = [
-            listaConceptos        : ConceptoPorProfesional
-
+            listaConceptos        : ConceptoPorProfesional,
+            movimientosProfesional: MovimientoProfesional
     ]
 
 

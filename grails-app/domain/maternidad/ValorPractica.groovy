@@ -14,6 +14,13 @@ class ValorPractica {
     PlanConvenio planConvenio
     Date fechaActualizado
 
+    static belongsTo = [planConvenio:PlanConvenio]
+
+    static mapping = {
+        planConvenio cascade:'all-delete-orphan'
+    }
+
+
     static constraints = {
 
         valorGasto(nullable: true,blank:true)

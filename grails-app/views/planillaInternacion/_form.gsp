@@ -1,16 +1,21 @@
 <%@ page import="maternidad.PlanillaInternacion" %>
 
 
-
+<g:if test="${planillaInternacionInstance?.paciente?.id != null}">
 <div class="fieldcontain ${hasErrors(bean: planillaInternacionInstance, field: 'paciente', 'error')} ">
     <label for="paciente">
         <g:message code="planillaInternacion.paciente.label" default="Paciente"/>
 
     </label>
+    <g:fieldValue bean="${planillaInternacionInstance?.paciente}" field="apellido"/>,
+    <g:fieldValue bean="${planillaInternacionInstance?.paciente}" field="nombre"/>
+    <g:hiddenField name="paciente" value="${planillaInternacionInstance?.paciente?.id}"></g:hiddenField>
+    <!--
     <g:select id="paciente" name="paciente.id" from="${maternidad.Persona.list()}" optionKey="id"
               value="${planillaInternacionInstance?.paciente?.id}" class="many-to-one" noSelection="['null': '']"/>
-
+    -->
 </div>
+</g:if>
 
 <div class="fieldcontain ${hasErrors(bean: planillaInternacionInstance, field: 'plan', 'error')} required">
     <label for="plan">
@@ -36,7 +41,7 @@
         <g:message code="planillaInternacion.nombreFamiliarResponsable.label" default="Nombre Familiar Responsable"/>
         <span class="required-indicator">*</span>
     </label>
-    <g:textField name="nombreFamiliarResponsable"
+    <g:textField name="nombreFamiliarResponsable" required=""
                  value="${planillaInternacionInstance?.nombreFamiliarResponsable}"/>
 
 </div>

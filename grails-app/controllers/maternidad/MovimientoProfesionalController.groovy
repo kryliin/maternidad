@@ -24,7 +24,11 @@ class MovimientoProfesionalController {
     }
 
     def create() {
-        respond new MovimientoProfesional(params)
+        def profesional = Profesional.get(params?.id)
+        def movimientoProfesional= new MovimientoProfesional(params)
+        movimientoProfesional?.profesional=profesional
+        respond  movimientoProfesional,model: [profesional:profesional]
+
     }
 
     @Transactional
@@ -44,7 +48,8 @@ class MovimientoProfesionalController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'movimientoProfesional.label', default: 'MovimientoProfesional'), movimientoProfesionalInstance.id])
-                redirect movimientoProfesionalInstance
+              //  redirect movimientoProfesionalInstance
+                redirect(controller:"profesional",action: "edit",params: [id:movimientoProfesionalInstance?.profesional?.id])
             }
             '*' { respond movimientoProfesionalInstance, [status: CREATED] }
         }
@@ -105,4 +110,50 @@ class MovimientoProfesionalController {
             '*' { render status: NOT_FOUND }
         }
     }
+
+
+
+    def saldo={
+
+        def movimientos = MovimientoProfesional.findAllById(0)
+
+
+
+        return [movimientoProfesionalInstanceList: movimientos, movimientoProfesionalInstanceCount: 0, total: 0]
+
+    }
+
+    def getmovimientosProfesional = {
+
+        if(params.idProfesional && params.idProfesional!='null' ) {
+            def profesionalInstance = Profesional.read(params?.idProfesional as String)
+            params.max = Math.min(params.max ? params.int('max') : 10, 100)
+            def movimientos = MovimientoProfesional.findAllByProfesional(profesionalInstance,[sort: "fecha", order: "desc",max: params.max, offset: params.offset])
+
+            def credito = MovimientoProfesional.executeQuery("select sum(monto) from MovimientoProfesional mp " +
+                    "where mp.credito=true and  mp.profesional = :profesional",
+                    [profesional: profesionalInstance])
+
+            def debito = MovimientoProfesional.executeQuery("select sum(monto) from MovimientoProfesional mp " +
+                    "where mp.credito=false and  mp.profesional = :profesional",
+                    [profesional: profesionalInstance])
+
+            def ing  = (credito[0])? credito[0]:0
+
+            def egr  = (debito[0])? debito[0]:0
+
+            def total = ing- egr
+
+            render(template: 'movimientos', model: [movimientoProfesionalInstanceList: movimientos, movimientoProfesionalInstanceCount: MovimientoProfesional.findAllByProfesional(profesionalInstance).size(), total: total,idProfesional:profesionalInstance?.id])
+        }
+        else {
+            def movimientos = MovimientoProfesional.findAllById(0)
+
+            render(template: 'movimientos', model: [movimientoProfesionalInstanceList: movimientos, movimientoProfesionalInstanceCount: 0, total: 0])
+        }
+    }
+
+
+
+
 }

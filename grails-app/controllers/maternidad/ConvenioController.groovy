@@ -1,6 +1,7 @@
 package maternidad
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.transaction.annotation.Propagation
 
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
@@ -12,6 +13,7 @@ class ConvenioController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    static transactional = false
     /*
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -81,6 +83,11 @@ class ConvenioController {
         if (convenioInstance.hasErrors()) {
             respond convenioInstance.errors, view: 'create'
             return
+        }
+
+        for(convenio in convenioInstance?.obrasocial?.convenios){
+          convenio.activo=false
+          convenio.save(flush: true)
         }
 
         convenioInstance.save flush: true
@@ -175,11 +182,84 @@ redirect controller: "plan", method:"POST" ,action: "create",params:["convenio":
 
     }
 
-def duplicar={
+    @Transactional(readOnly = false)
+    def duplicar(){
 
 
     def convenio=Convenio.get(params.id as Long)
 
+    convenio.activo=false
+
+    convenio.save flush: true
+
+    def convenioAux= new Convenio()
+
+    //convenio
+    convenioAux?.fechaInicio= convenio?.fechaFin?.plus(1)//new Date()
+    convenioAux?.fechaFin= convenio?.fechaFin?.plus(365)
+    convenioAux?.activo=true
+    convenioAux?.codigo=''
+    convenioAux?.obrasocial=convenio?.obrasocial
+    convenioAux?.observacion=convenio?.observacion
+
+    convenioAux.save flush: true
+
+    //Plan Convenio
+    for( planConvenio in convenio?.planConvenio ) {
+    def planConvenioAux= new PlanConvenio()
+    planConvenioAux?.activo=planConvenio?.activo
+    planConvenioAux.convenio=convenioAux
+    planConvenioAux.plan=planConvenio?.plan
+    planConvenioAux.save flush: true
+
+        //valores Galeno Gasto
+        for(valorGalenoGasto in planConvenio?.valoresGalenoGasto){
+            def valorGalenoGastoAux=new ValorGalenoGasto()
+            valorGalenoGastoAux?.planConvenio=planConvenioAux
+            valorGalenoGastoAux?.tipoGasto=valorGalenoGasto?.tipoGasto
+            valorGalenoGastoAux?.valor=valorGalenoGasto?.valor
+            valorGalenoGastoAux.save flush: true
+        }
+
+        //valores Galeno Honorario
+        for(valorGalenoHonorario in planConvenio?.valoresGalenoHonorario){
+            def valorGalenoHonorarioAux=new ValorGalenoHonorario()
+            valorGalenoHonorarioAux?.planConvenio=planConvenioAux
+            valorGalenoHonorarioAux.tipoHonorario=valorGalenoHonorario?.tipoHonorario
+            valorGalenoHonorarioAux?.valor=valorGalenoHonorario?.valor
+            valorGalenoHonorarioAux.save flush: true
+        }
+
+        //valor practica
+        for(valorPractica  in planConvenio?.valoresPracticas){
+            def valorPracticaAux=new ValorPractica()
+            valorPracticaAux?.planConvenio=planConvenioAux
+            valorPracticaAux?.plan=planConvenioAux?.plan
+            valorPracticaAux?.fechaActualizado=new Date()
+            valorPracticaAux?.practica=valorPractica?.practica
+            valorPracticaAux?.valorAnestecista=valorPractica?.valorAnestecista
+            valorPracticaAux?.valorHonorario=valorPractica?.valorHonorario
+            valorPracticaAux?.valorAyudante=valorPractica?.valorAyudante
+            valorPracticaAux?.valorEspecialista=valorPractica?.valorEspecialista
+            valorPracticaAux?.valorGasto=valorPractica?.valorGasto
+            valorPracticaAux?.valorGastoModulo=valorPractica?.valorGastoModulo
+            valorPracticaAux?.valorHonorarioModulo=valorPractica?.valorHonorarioModulo
+            valorPracticaAux.save flush: true
+        }
+
+
+
+     /*   request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'Convenio.label', default: 'Convenio'), convenioAux?.id])
+                redirect(action: "index")
+            }
+            '*' { respond convenioAux?.id, [status: OK],view:'index' }
+        }
+*/
+
+    }
+        redirect(action: "index")
 }
 
 

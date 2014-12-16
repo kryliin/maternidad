@@ -33,7 +33,8 @@
 <div class="buttons">
     <span class="button">
         <g:form controller="PagoFactura">
-            <g:hiddenField name="id" value="${listaPagos?.factura}"/>
+
+            <g:hiddenField name="id" value="${factura?.id}"/>
             <g:actionSubmit controller="PagoFactura"
                             action="create"
                             value="Agregar Pago"

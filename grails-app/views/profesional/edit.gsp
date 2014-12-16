@@ -180,6 +180,79 @@
                 <g:paginate total="${profesionalInstance?.listaConceptos?.size() ?: 0}" />
             </div>
 
-		</div>
+
+
+            <div id="create-movimientoProfesional" class="content scaffold-create" role="main">
+                <div class="nav" role="navigation">
+                    <ul>
+                    <li><g:link class="create" controller="movimientoProfesional" action="create" id="${profesionalInstance?.id}"><g:message code="default.new.label" args="['Movimiento']" /></g:link></li>
+                    </ul>
+                </div>
+
+                <h1><g:message code="profesional.cuentacorriente"  /></h1>
+                <g:if test="${flash.message}">
+                    <div class="message" role="status">${flash.message}</div>
+                </g:if>
+
+                <fieldset class="form">
+                    <table>
+                        <tbody>
+
+                        <tr id="filaoculta" class="prop">
+                            <td valign="top" class="name">
+                                <label for="profesional">Profesional</label>
+                            </td>
+                            <td valign="top" class="value ">
+                                <g:select id="profesional" name="profesional.id" from="${maternidad.Profesional.list()}" optionKey="id"  noSelection="['null':'Seleccione un Profesional']"
+                                          onchange="${remoteFunction(controller: 'movimientoProfesional',
+                                                  action: 'getmovimientosProfesional',
+                                                  params: '\'idProfesional=\' + this.value',
+                                                  update: 'divprofesional')}"
+                                />
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td></td>
+                            <td><div id="divprofesional">
+                                <g:render  template="/movimientoProfesional/movimientos"
+                                           model="[movimientoProfesionalInstanceList: movimientos, movimientoProfesionalInstanceCount: movimientos?.size(), total: total]"    />
+                            </div>
+                            </td>
+                        </tr>
+
+
+
+                        </tbody>
+                    </table>
+                </fieldset>
+
+            </div>
+
+
+
+
+            <script>
+                $(function() {
+
+                    $('#profesional').change(function(e){
+
+                        $("#profesional").val('${profesionalInstance?.id}');
+                        $("#profesional").prop("disabled", true);
+                        $("#filaoculta").hide();
+                    });
+
+                    // And now fire change event when the DOM is ready
+                    $('#profesional').trigger('change');
+
+                    // $("#obrasocial").attr('readonly',true).select2({allowClear: true});
+                   // $("#obrasocial").attr('readonly',true);
+
+                })
+
+            </script>
+
+
+
+        </div>
 	</body>
 </html>

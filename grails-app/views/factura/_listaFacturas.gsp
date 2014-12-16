@@ -43,7 +43,7 @@
 
                 <g:else>
                     <g:form controller="PagoFactura">
-                        <g:hiddenField name="id" value="${item}"/>
+                        <g:hiddenField name="id" value="${item?.id}"/>
                         <g:actionSubmit controller="PagoFactura"
                                         action="create"
                                         value="Agregar Pago"

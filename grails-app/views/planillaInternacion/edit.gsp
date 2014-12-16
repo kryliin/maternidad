@@ -29,6 +29,7 @@
     <ul>
         <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
         <li><g:link class="list" action="index"><g:message code="planillaInternacion.list.label" args="[entityName]"/></g:link></li>
+        <li><g:link class="list" action="create" controller="nacimiento" id="${planillaInternacionInstance?.id}"><g:message code="nacimiento.edit.label" args="[entityName]"/></g:link></li>
 
     </ul>
 </div>
@@ -51,6 +52,11 @@
         <fieldset class="form">
             <g:render template="form"/>
         </fieldset>
+        <g:if test="${planillaInternacionInstance?.nacimientos}">
+            <fieldset class="form">
+                <g:render template="nacimientos" />
+            </fieldset>
+        </g:if>
         <fieldset class="buttons">
             <g:actionSubmit class="save" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"/>

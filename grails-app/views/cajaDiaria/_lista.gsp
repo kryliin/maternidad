@@ -14,6 +14,11 @@
 
             <g:sortableColumn property="monto" title="${message(code: 'detalleCaja.monto.label', default: 'Monto')}" />
 
+            <th></th>
+
+            <th></th>
+
+
         </tr>
         </thead>
         <tbody>
@@ -31,6 +36,7 @@
                 <td><g:formatBoolean true="Crédito" false="Débito" boolean="${detalleCajaInstance.credito}" /></td>
 
                 <td>$ ${fieldValue(bean: detalleCajaInstance, field: "monto")}</td>
+
 
             </tr>
         </g:each>

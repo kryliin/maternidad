@@ -157,7 +157,10 @@
 					
 				</li>
 				</g:if>
-			
+
+
+
+
 			</ol>
 			<g:form url="[resource:personaInstance, action:'delete']" method="DELETE">
 				<fieldset class="buttons">

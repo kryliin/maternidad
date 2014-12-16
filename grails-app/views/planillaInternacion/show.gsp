@@ -15,6 +15,7 @@
     <ul>
         <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
         <li><g:link class="list" action="index"><g:message code="planillaInternacion.list.label" args="[entityName]"/></g:link></li>
+        <li><g:link class="list" action="create" controller="nacimiento" id="${planillaInternacionInstance?.id}"><g:message code="nacimiento.edit.label" args="[entityName]"/></g:link></li>
 
     </ul>
 </div>
@@ -30,9 +31,7 @@
             <li class="fieldcontain">
                 <span id="paciente-label" class="property-label"><g:message code="planillaInternacion.paciente.label"
                                                                             default="Paciente"/></span>
-
-                <span class="property-value" aria-labelledby="paciente-label"><g:link controller="persona" action="show"
-                                                                                      id="${planillaInternacionInstance?.paciente?.id}">${planillaInternacionInstance?.paciente?.encodeAsHTML()}</g:link></span>
+                <span class="property-value" aria-labelledby="paciente-label">${planillaInternacionInstance?.paciente?.encodeAsHTML()}</span>
 
             </li>
         </g:if>
@@ -106,6 +105,12 @@
         </g:if>
 
     </ol>
+    <!-- Listado de Nacimientos -->
+    <g:if test="${planillaInternacionInstance?.nacimientos}">
+        <fieldset class="form">
+            <g:render template="nacimientos" />
+        </fieldset>
+    </g:if>
     <g:form url="[resource: planillaInternacionInstance, action: 'delete']" method="DELETE">
         <fieldset class="buttons">
             <g:link class="edit" action="edit" resource="${planillaInternacionInstance}"><g:message

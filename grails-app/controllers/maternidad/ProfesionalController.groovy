@@ -92,7 +92,7 @@ class ProfesionalController {
         }
 
         if (personaInstance.hasErrors()) {
-            respond profesionalInstance.errors, view: 'create'
+            respond personaInstance.errors, view: 'create'
             return
         }
 

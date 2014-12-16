@@ -9,7 +9,7 @@
         <tr>
 
             <g:sortableColumn property="id"
-                              title="${message(code: 'planillaInternacion.id', default: '#')}"/>
+                              title="${message(code: 'planillaInternacion.id', default: 'Nº')}"/>
 
             <th><g:message code="planillaInternacion.paciente.label" default="Paciente"/></th>
 
@@ -27,17 +27,17 @@
             <g:sortableColumn property="fechaAlta"
                               title="${message(code: 'planillaInternacion.fechaAlta.label', default: 'Fecha Alta')}"/>
 
+            <th></th>
+
+            <th></th>
+
         </tr>
         </thead>
         <tbody>
         <g:each in="${planillaInternacionInstanceList}" status="i" var="planillaInternacionInstance">
             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
-                <td>
-                    <g:link action="show" id="${planillaInternacionInstance.id}">
-                        ${fieldValue(bean: planillaInternacionInstance, field: "id")}
-                    </g:link>
-                </td>
+                <td>${fieldValue(bean: planillaInternacionInstance, field: "id")}</td>
 
                 <td>${fieldValue(bean: planillaInternacionInstance, field: "paciente")}</td>
 
@@ -50,6 +50,13 @@
                 <td>${fieldValue(bean: planillaInternacionInstance, field: "telefonoFamiliarResponsable")}</td>
 
                 <td><g:formatDate type="date" style="MEDIUM"  date="${planillaInternacionInstance.fechaAlta}"/></td>
+
+                <!-- ACCIONES -->
+                <td><g:link class="linkShow" action="show" id="${planillaInternacionInstance.id}">${message(code: 'default.button.show.label')}</g:link></td>
+
+                <td><g:link class="linkEdit" action="edit" id="${planillaInternacionInstance.id}">${message(code: 'default.button.edit.label')}</g:link></td>
+
+
 
             </tr>
         </g:each>

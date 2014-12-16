@@ -7082,3 +7082,4 @@ INSERT INTO sami.valor_unidad_honorario(             id, version, componente_id,
 INSERT INTO sami.valor_unidad_honorario(             id, version, componente_id, practica_id, valor)     VALUES (4564,0,3,1178,52.5);
 
 
+select setval('sami.seq_practica', 1521, true);

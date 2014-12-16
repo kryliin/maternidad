@@ -8,9 +8,10 @@ import grails.transaction.Transactional
 @Secured("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
 
 
-
 @Transactional(readOnly = true)
 class TipoPagoController {
+
+
     static scaffold = true
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 

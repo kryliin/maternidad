@@ -1,9 +1,10 @@
 package maternidad
 
 import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.Transactional
+import maternidad.Factura
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
 @Secured("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
 @Transactional(readOnly = true)
@@ -12,6 +13,13 @@ class PagoFacturaController {
     static scaffold = true
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+
+
+    def beforeInterceptor = {
+
+    }
+
+
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -24,10 +32,10 @@ class PagoFacturaController {
 
     def create() {
 
-        println 'params'
-        println params.dump()
+        def pagoFactura = new PagoFactura(params)
+        pagoFactura?.factura = Factura?.findById(params?.id)
+        respond pagoFactura
 
-        respond new PagoFactura(params)
     }
 
     @Transactional
@@ -40,22 +48,49 @@ class PagoFacturaController {
         if (pagoFacturaInstance.hasErrors()) {
             respond pagoFacturaInstance.errors, view: 'create'
             return
-        }
+        } else {
+            def facturaSeleccionada = new Factura()
+            facturaSeleccionada = Factura?.get(pagoFacturaInstance?.factura?.id)
+            def totalFacturaPagado
+            def totalRetencionesPago
+            pagoFacturaInstance.save(flush: true)
 
-        println 'params save'
-        println params.dump()
-
-        //LOGICA DE GUARDAR UN NUEVO PAGO Y REDUCIR EL MONTO DE LA FACTURA
-
-
-        pagoFacturaInstance.save flush: true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'pagoFactura.label', default: 'PagoFactura'), pagoFacturaInstance.id])
-                redirect pagoFacturaInstance
+            if (facturaSeleccionada?.pagosFactura?.size() > 0) {
+                totalFacturaPagado = facturaSeleccionada.getTotalPagos()
+            } else {
+                totalFacturaPagado = 0
             }
-            '*' { respond pagoFacturaInstance, [status: CREATED] }
+
+            if (totalRetencionesPago?.getTotalRetencion?.size() > 0) {
+                totalRetencionesPago = facturaSeleccionada.getTotalRetencion()
+            } else {
+                totalRetencionesPago = 0
+            }
+
+            def totalAPagarConRetenciones = totalFacturaPagado - totalRetencionesPago
+            def totalDFacturadoSinRetenciones = facturaSeleccionada?.totalFacturado - totalAPagarConRetenciones
+            facturaSeleccionada?.totalPagado = totalAPagarConRetenciones + pagoFacturaInstance?.monto
+
+
+//            println  'facturaSeleccionada?.totalPagado'
+//            println  facturaSeleccionada?.totalPagado
+//            println  'otalDFacturadoSinRetenciones'
+//            println  totalDFacturadoSinRetenciones
+
+            if (facturaSeleccionada?.totalPagado > totalDFacturadoSinRetenciones) {
+                flash.message = 'El monto es superior al total facturado'
+                render(view: 'index', controller: PagoFactura)
+            } else {
+                if (facturaSeleccionada?.totalPagado == totalDFacturadoSinRetenciones) facturaSeleccionada?.pagoCompleto = true
+
+
+
+
+
+                facturaSeleccionada.save(flush: true)
+                flash.message = 'Se ha agregado un pago a su factura '
+                render(view: 'index', params: [pagoFacturaInstance: pagoFacturaInstance])
+            }
         }
     }
 

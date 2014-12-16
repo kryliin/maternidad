@@ -20,5 +20,9 @@ class PlanillaInternacion {
         observaciones(nullable: true,blank:true, size: 0..5000)
     }
 
+    static hasMany = [
+            nacimientos: Nacimiento
+    ]
+
     String toString() { "Nº ${id}" }
 }
